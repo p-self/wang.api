@@ -5,13 +5,13 @@ const appFigures = require("../lib/appfigures")
 
 /* GET users listing. */
 router.get('/search', function(req, res, next) {
-    appFigures.searchAppfigures(encodeURIComponent(req.query.appname),function (figures) {
+    appFigures.searchAppfigures(req.query,function (figures) {
         res.json(figures)
     })
 });
 
 router.get('/download', function(req, res, next) {
-    appFigures.requestAppfigures(req.query.appid,function (figures) {
+    appFigures.requestAppfigures(req.query,function (figures) {
         res.set({
             'Content-Type': 'application/octet-stream',
             'Content-Disposition': 'attachment; filename='+require('urlencode')(req.query.appname)+'.csv'
