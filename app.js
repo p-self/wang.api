@@ -25,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 app.use('/appfigures', require("./routes/appfigures"));
+app.use('/runjs', require("./routes/runjs"));
 app.use('/auth/oauth', require("./routes/auth/oauth"));
 
 // catch 404 and forward to error handler
