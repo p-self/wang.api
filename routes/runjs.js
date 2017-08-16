@@ -14,9 +14,9 @@ const sequelize = new Sequelize(config.db, config.username, config.password, {
 });
 
 const Runjs = sequelize.define('runjs', {
-    css: Sequelize.STRING,
-    js: Sequelize.STRING,
-    html: Sequelize.STRING,
+    css: Sequelize.TEXT,
+    js: Sequelize.TEXT,
+    html: Sequelize.TEXT,
     show_code:Sequelize.STRING,//兼容原来的runjs
 });
 
@@ -77,38 +77,41 @@ router.get('/:id', function(req, res, next) {
  */
 router.get('/view/:id', function(req, res, next) {
     Runjs.findOne({ where: { id: req.params.id } }).then(runjs => {
-        const $ = require("cheerio").load(runjs.html, {
-            xml: {
-                normalizeWhitespace: true,
-            }
-        });
-
-        //在head前面追加style
-        $("head").append($(`<style>${runjs.css}</style>`))
-
-        //在body后面追加js
-        $("body").append($(`<script>${runjs.js}</script>`))
-
-        res.send($.html());
+        processHTML(runjs).then(function (html) {
+            res.send(html)
+        })
     })
 });
 
 router.get('/show/:show_code', function(req, res, next) {
     Runjs.findOne({ where: { show_code: req.params.show_code } }).then(runjs => {
+        processHTML(runjs).then(function (html) {
+            res.send(html)
+        })
+    })
+});
+
+function processHTML(runjs) {
+    return new Promise(function (resolve) {
         const $ = require("cheerio").load(runjs.html, {
             xml: {
-                normalizeWhitespace: true,
+                withDomLvl1: true,
+                normalizeWhitespace: false,
+                xmlMode: false,
+                decodeEntities: false
             }
         });
 
+        console.log(runjs.html)
+
         //在head前面追加style
-        $("head").append($(`<style>${runjs.css}</style>`))
+        $("head").append((`<style>${runjs.css}</style>`))
 
         //在body后面追加js
-        $("body").append($(`<script>${runjs.js}</script>`))
+        $("body").append((`<script>${runjs.js}</script>`))
 
-        res.send($.html());
+        resolve($.html());
     })
-});
+}
 
 module.exports = router;
