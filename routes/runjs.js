@@ -16,51 +16,32 @@ const sequelize = new Sequelize(config.db, config.username, config.password, {
 const Runjs = sequelize.define('runjs', {
     css: Sequelize.TEXT,
     js: Sequelize.TEXT,
-    html: Sequelize.TEXT,
-    show_code:Sequelize.STRING,//兼容原来的runjs
+    html: Sequelize.TEXT
 });
 
 /**
  * 将代码提交到远程并分配id
  */
 router.post('/', function(req, res, next) {
-    const js = req.body.js,
-        css = req.body.css,
-        html = req.body.html,
-        show_code = req.body.show_code,
-        id = req.body.id;
-    if(id){
+    if(req.body.id){
         //更新
-        Runjs.findOne({where: {id: id}}).then(runjs => {
-            if (css) {
-                runjs.css = css;
-            }
-            if (html) {
-                runjs.html = html;
-            }
-            if (js) {
-                runjs.js = js;
-            }
-            if (show_code) {
-                runjs.show_code = show_code;
-            }
-
+        Runjs.findOne({where: {id: req.body.id}}).then(runjs => {
+            Object.keys(req.body).forEach(function (key) {
+                runjs[key] = req.body[key];
+            });
             runjs.save();
+            res.json(runjs);
         })
     }else{
         //新增
         Runjs.sync({
             // force:true
         }).then(() => {
-            Runjs.create({
-                js,
-                html,
-                css
+            Runjs.create(req.body).then(function (runjs) {
+                res.json(runjs);
             })
         });
     }
-
-    res.send('respond with a resource');
 });
 
 /**
@@ -77,14 +58,6 @@ router.get('/:id', function(req, res, next) {
  */
 router.get('/view/:id', function(req, res, next) {
     Runjs.findOne({ where: { id: req.params.id } }).then(runjs => {
-        processHTML(runjs).then(function (html) {
-            res.send(html)
-        })
-    })
-});
-
-router.get('/show/:show_code', function(req, res, next) {
-    Runjs.findOne({ where: { show_code: req.params.show_code } }).then(runjs => {
         processHTML(runjs).then(function (html) {
             res.send(html)
         })
