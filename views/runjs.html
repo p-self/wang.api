@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/codemirror/5.28.0/codemirror.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="form-group">
+                <label>html：</label>
+                <textarea v-model="runjs.html" rows="10" class="form-control"></textarea>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <div class="form-group">
+                <label>css：</label>
+                <textarea v-model="runjs.css" rows="10" class="form-control"></textarea>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <div class="form-group">
+                <label>js：</label>
+                <textarea v-model="runjs.js" rows="10" class="form-control"></textarea>
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <button @click="saveData(runjs)" class="btn btn-primary btn-lg">保存数据</button>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.4.2/vue.min.js"></script>
+<script>
+    let api = "http://127.0.0.1:3000/runjs";
+    new Vue({
+        el: '.container',
+        data:{
+            runjs:{
+                css:'',
+                html:'',
+                js:'',
+            }
+        },
+        methods:{
+            saveData(runjs){
+                $.post(`${api}`,runjs,function (data) {
+                })
+            }
+        },
+        mounted(){
+            const that =this;
+            $.get(`${api}/1`,function (data) {
+                that.runjs = data;
+            })
+        }
+    });
+</script>
+</body>
+</html>
