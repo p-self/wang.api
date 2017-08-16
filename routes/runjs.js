@@ -50,7 +50,7 @@ router.post('/', function(req, res, next) {
     }else{
         //新增
         Runjs.sync({
-            force:true
+            // force:true
         }).then(() => {
             Runjs.create({
                 js,
