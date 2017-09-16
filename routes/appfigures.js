@@ -1,7 +1,7 @@
 
 var express = require('express');
 var router = express.Router();
-const appFigures = require("../lib/appfigures")
+const appFigures = require("./appfigures/appfigures")
 
 /* GET users listing. */
 router.get('/search', function(req, res, next) {
